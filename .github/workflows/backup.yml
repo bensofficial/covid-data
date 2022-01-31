@@ -1,0 +1,28 @@
+name: Backup
+
+on:
+  schedule:
+    - cron:  '0 20 * * *'
+  push:
+    branches: [ main ]
+
+jobs:
+  copy-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execution of the file
+        env:
+          URL: ${{ secrets.URL }}
+        run: wget -O data.csv $URL
+
+      - name: Pushes test file
+        uses: dmnemec/copy_file_to_another_repo_action@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          EMAIL: ${{ secrets.EMAIL }}
+        with:
+          source_file: 'data.csv'
+          destination_repo: 'bensofficial/covid-data'
+          user_email: $EMAIL
+          user_name: 'bensofficial'
+          commit_message: 'Backup data'
